@@ -286,6 +286,7 @@ void calibrate_mag(void)
   init_imu();
 
   ESP_LOGW(TAG, "Rotate the magnometer around all 3 axes, until the min and max values don't change anymore.");
+  wait();  // 延时10秒,等待用户准备
 
   printf("    x        y        z      min x     min y     min z     max x     max y     max z\n");
   for (int i = 0; i < NUM_MAG_READS; i += 1)
