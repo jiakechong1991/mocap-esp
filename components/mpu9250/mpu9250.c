@@ -62,7 +62,7 @@ esp_err_t i2c_mpu9250_init(calibration_t *c)
   ESP_LOGD(TAG, "i2c_mpu9250_init");
 
   ESP_ERROR_CHECK(i2c_write_bit(I2C_MASTER_NUM, MPU9250_I2C_ADDR, MPU9250_RA_PWR_MGMT_1, MPU9250_PWR1_DEVICE_RESET_BIT, 1));
-  vTaskDelay(10 / portTICK_PERIOD_MS);
+  vTaskDelay(10 / portTICK_PERIOD_MS);  // 10ms
 
   // define clock source
   ESP_ERROR_CHECK(set_clock_source(MPU9250_CLOCK_PLL_XGYRO));
@@ -76,7 +76,7 @@ esp_err_t i2c_mpu9250_init(calibration_t *c)
   ESP_ERROR_CHECK(set_full_scale_accel_range(MPU9250_ACCEL_FS_4));
   vTaskDelay(10 / portTICK_PERIOD_MS);
 
-  // disable sleepEnabled
+  // disable sleepEnabled 低功耗模式
   ESP_ERROR_CHECK(set_sleep_enabled(false));
   vTaskDelay(10 / portTICK_PERIOD_MS);
 

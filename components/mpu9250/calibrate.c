@@ -39,7 +39,7 @@ static calibration_t cal = {
     .accel_scale_hi = {.x = 1.0, .y = 1.0, .z = 1.0},
     .gyro_bias_offset = {.x = 0.0, .y = 0.0, .z = 0.0}};
 
-void wait(void)
+void wait(void)  //delay 10秒
 {
   for (int i = 10; i >= 0; i -= 1)
   {
@@ -80,7 +80,7 @@ void calibrate_gyro(void)
 
   ESP_LOGI(TAG, "--- GYRO CALIBRATION ---");
   ESP_LOGW(TAG, "Keep the MPU very still.  Calculating gyroscope bias");
-  wait();
+  wait(); // 10秒睡眠
 
   vector_t vg_sum;
   vg_sum.x = 0.0;
@@ -116,13 +116,15 @@ void calibrate_gyro(void)
  * ACCELEROMETER 
  * 
  * 
- * Calibrate the Accelerometer.  This device will need to be rotated with the X, Y and Z axes up and down.  The axis
- * you point up/down will be calibrated against gravity (so you must have it vertical).  You may want to hold it against
- * a wall or similar.  While the one axis is being calibrated against gravity, the other two axes will be perpendicular
- * to gravity, so will read near zero, this value will be used as the offset.
+ * Calibrate the Accelerometer.  This device will need to be rotated[翻转] with the X, Y and Z axes up and down.  The axis
+ * you point up/down will be calibrated against[针对/根据] gravity[重力] (so you must have it vertical[垂直]).  
+ * You may want to hold it against[根据] a wall[墙] or similar.  
+ * While the one axis is being calibrated against gravity, the other two axes will be perpendicular[垂直]
+ * to gravity, so will read near[取近] zero, this value will be used as the offset(这时这个值就是偏移量).
  *
- * The scaling is simple linear scaling, based on the common formular for a line, y = m * x + c, where y is our scaled
- * and offset result, while x is the raw value.  This formular is actually applied in the main mpu9250.js file.  But
+ * The scaling is simple linear scaling[线性缩放], based on the common formular[公式] for a line, y = m * x + c, 
+ * where y is our scaled[缩放系数] and offset[偏移] result, while x is the raw value.  
+ * This formular is actually applied in the main mpu9250.js file.  But
  * this calibration process outputs those values.
  */
 
@@ -217,16 +219,17 @@ void run_next_capture(int axis, int dir)
 {
   ESP_LOGW(TAG, "Point the %s axis arrow %s.", axes[axis], directions[dir]);
 
-  wait();
+  wait();  // 延时10秒
   calibrate_accel_axis(axis, dir);
 }
 
-void calibrate_accel(void)
+void calibrate_accel(void)  //校准acc
 {
   init_imu();
 
   ESP_LOGI(TAG, "--- ACCEL CALIBRATION ---");
 
+  // 跟随进行操作
   run_next_capture(X_AXIS, DIR_UP);
   run_next_capture(X_AXIS, DIR_DOWN);
   run_next_capture(Y_AXIS, DIR_UP);
@@ -234,6 +237,7 @@ void calibrate_accel(void)
   run_next_capture(Z_AXIS, DIR_UP);
   run_next_capture(Z_AXIS, DIR_DOWN);
 
+  // 计算
   offset.x /= (NUM_ACCEL_READS * 4.0);
   offset.y /= (NUM_ACCEL_READS * 4.0);
   offset.z /= (NUM_ACCEL_READS * 4.0);
@@ -243,7 +247,7 @@ void calibrate_accel(void)
   scale_hi.x /= NUM_ACCEL_READS;
   scale_hi.y /= NUM_ACCEL_READS;
   scale_hi.z /= NUM_ACCEL_READS;
-
+  // 校准结果
   printf("    .accel_offset = {.x = %f, .y = %f, .z = %f},\n    .accel_scale_lo = {.x = %f, .y = %f, .z = %f},\n    .accel_scale_hi = {.x = %f, .y = %f, .z = %f},\n",
          offset.x, offset.y, offset.z,
          scale_lo.x, scale_lo.y, scale_lo.z,
@@ -255,8 +259,8 @@ void calibrate_accel(void)
  * MAGNETOMETER
  * 
  * 
- * Once the calibration is started you will want to move the sensor around all axes.  What we want is to find the
- * extremes (min/max) of the x, y, z values such that we can find the offset and scale values.
+ * Once the calibration is started you will want to move the sensor around all axes[8字一路狂甩].  What we want is to find the
+ * extremes[极值] (min/max) of the x, y, z values such that[以便] we can find the offset and scale values.
  *
  * These calibration calculations are based on this page:
  * http://www.camelsoftware.com/2016/03/13/imu-maths-calculate-orientation-pt3/

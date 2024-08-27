@@ -60,7 +60,7 @@ esp_err_t i2c_master_init(uint8_t i2c_num, uint8_t gpio_sda, uint8_t gpio_scl)
   ESP_ERROR_CHECK(i2c_driver_install(i2c_master_port, conf.mode,I2C_RX_BUF_DISABLE, I2C_TX_BUF_DISABLE,0));
   return ESP_OK;
 }
-
+//////////////////////////////////////i2c read-write////////////////////////////////////////////
 esp_err_t i2c_write_bytes(i2c_port_t i2c_num, uint8_t periph_address, uint8_t reg_address, uint8_t *data, size_t data_len)
 {
   int ret;
@@ -81,7 +81,10 @@ esp_err_t i2c_write_byte(i2c_port_t i2c_num, uint8_t periph_address, uint8_t reg
   return i2c_write_bytes(i2c_num, periph_address, reg_address, &data, 1);
 }
 
-esp_err_t i2c_read_bytes(i2c_port_t i2c_num, uint8_t periph_address, uint8_t reg_address, uint8_t *data, size_t data_len)
+esp_err_t i2c_read_bytes(i2c_port_t i2c_num, 
+  uint8_t periph_address,  // device address
+  uint8_t reg_address,  // register address
+  uint8_t *data, size_t data_len)
 {
   int ret;
   i2c_cmd_handle_t cmd = i2c_cmd_link_create();

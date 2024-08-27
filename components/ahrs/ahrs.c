@@ -27,7 +27,7 @@
 
 volatile float sampleFreq = 50;                            // 2 * proportional gain (Kp)
 volatile float beta = 0.8;                                 // 2 * proportional gain (Kp)
-volatile float q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f; // quaternion of sensor frame relative to auxiliary frame
+volatile float q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f; // quaternion of sensor frame relative to auxiliary[辅助] frame
 
 //====================================================================================================
 // Functions
@@ -239,8 +239,8 @@ float norm_angle_0_2pi(float a)
 }
 
 /**
- * Return an object with the Euler angles {heading; pitch, roll}, in radians.
- *
+ * Return an object with the Euler angles {heading; pitch, roll}, in radians[弧度].
+ * 四元数-->欧拉角[弧度]
  * Where:
  *   - heading is from magnetic north, going west (about z-axis).
  *   - pitch is from vertical, going forward (about y-axis).
@@ -278,6 +278,7 @@ void ahrs_get_euler_in_degrees(float *heading, float *pitch, float *roll)
 {
   MadgwickGetEulerAngles(heading, pitch, roll);
 
+  // 弧度转角度
   *heading *= RAD_2_DEG;
   *pitch *= RAD_2_DEG;
   *roll *= RAD_2_DEG;
