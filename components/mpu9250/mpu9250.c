@@ -30,7 +30,7 @@
 static const char *TAG = "mpu9250";
 
 static bool initialised = false;
-static calibration_t *cal;
+static calibration_t *cal;  // 在IMU初始化时，读取到校准数据
 
 static float gyro_inv_scale = 1.0;
 static float accel_inv_scale = 1.0;
@@ -185,7 +185,7 @@ float scale_accel(float value, float offset, float scale_lo, float scale_hi)
   }
 }
 
-void align_accel(uint8_t bytes[6], vector_t *v)
+void align_accel(uint8_t bytes[6], vector_t *v)  // 执行矫正
 {
   int16_t xi = BYTE_2_INT_BE(bytes, 0);
   int16_t yi = BYTE_2_INT_BE(bytes, 2);
@@ -213,7 +213,7 @@ esp_err_t get_accel(vector_t *v)
   return ESP_OK;
 }
 
-void align_gryo(uint8_t bytes[6], vector_t *v)
+void align_gryo(uint8_t bytes[6], vector_t *v)  // 执行矫正
 {
   int16_t xi = BYTE_2_INT_BE(bytes, 0);
   int16_t yi = BYTE_2_INT_BE(bytes, 2);
@@ -224,7 +224,7 @@ void align_gryo(uint8_t bytes[6], vector_t *v)
   v->z = (float)zi * gyro_inv_scale + cal->gyro_bias_offset.z;
 }
 
-esp_err_t get_gyro(vector_t *v)
+esp_err_t get_gyro(vector_t *v)  // 读取
 {
   esp_err_t ret;
   uint8_t bytes[6];

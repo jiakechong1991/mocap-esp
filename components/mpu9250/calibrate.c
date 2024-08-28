@@ -52,7 +52,7 @@ void wait(void)  //delay 10秒
 
 static void init_imu(void)
 {
-  static bool init_imu_done = false;
+  static bool init_imu_done = false;  // 仅初始化一次
   if (init_imu_done)
     return;
   i2c_mpu9250_init(&cal);
@@ -86,7 +86,7 @@ void calibrate_gyro(void)
   vg_sum.x = 0.0;
   vg_sum.y = 0.0;
   vg_sum.z = 0.0;
-  for (int i = 0; i < NUM_GYRO_READS; i += 1)
+  for (int i = 0; i < NUM_GYRO_READS; i += 1)  //多次读取
   {
 
     vector_t vg;
@@ -104,7 +104,7 @@ void calibrate_gyro(void)
     pause();
   }
 
-  vg_sum.x /= -NUM_GYRO_READS;
+  vg_sum.x /= -NUM_GYRO_READS;  // 为什么要加上 负号呢
   vg_sum.y /= -NUM_GYRO_READS;
   vg_sum.z /= -NUM_GYRO_READS;
 
@@ -137,9 +137,7 @@ const char *axes[] = {"X", "Y", "Z"};
 
 #define DIR_UP (0)
 #define DIR_DOWN (1)
-const char *directions[] = {
-    "up",
-    "down"};
+const char *directions[] = {"up", "down"};
 
 vector_t offset = {.x = 0, .y = 0, .z = 0};
 vector_t scale_lo = {.x = 0, .y = 0, .z = 0};
@@ -153,36 +151,36 @@ void calibrate_accel_axis(int axis, int dir)
   vector_t va;
 
   ESP_LOGI(TAG, "Reading values - hold still");
-  for (int i = 0; i < NUM_ACCEL_READS; i++)
+  for (int i = 0; i < NUM_ACCEL_READS; i++)  // 1000次
   {
     get_accel(&va);
 
     if (axis == X_AXIS)
     {
-      if (dir == DIR_UP)
+      if (dir == DIR_UP)  // X-up
       {
         scale_lo.x += va.x;
       }
-      else
+      else  // X-down
       {
         scale_hi.x += va.x;
       }
     }
     else
     {
-      offset.y += va.y;
-      offset.z += va.z;
+      offset.y += va.y; // 计算g的水平投影y
+      offset.z += va.z; // 计算g的水平投影z
     }
 
     if (axis == Y_AXIS)
     {
       if (dir == DIR_UP)
       {
-        scale_lo.y += va.y;
+        scale_lo.y += va.y; // y的up方向累加
       }
       else
       {
-        scale_hi.y += va.y;
+        scale_hi.y += va.y; // y的down方向累加
       }
     }
     else
@@ -238,7 +236,7 @@ void calibrate_accel(void)  //校准acc
   run_next_capture(Z_AXIS, DIR_DOWN);
 
   // 计算
-  offset.x /= (NUM_ACCEL_READS * 4.0);
+  offset.x /= (NUM_ACCEL_READS * 4.0); // 每个多计算了4倍
   offset.y /= (NUM_ACCEL_READS * 4.0);
   offset.z /= (NUM_ACCEL_READS * 4.0);
   scale_lo.x /= NUM_ACCEL_READS;
