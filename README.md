@@ -16,7 +16,7 @@ This code is based on the following: https://github.com/miniben-90/mpu9250
 - master for ESP8266:
   - GPIO14 is assigned as the data signal of i2c master port
   - GPIO2 is assigned as the clock signal of i2c master port
-
+注意要配置我们的i2c引脚
 ## Configure the project
 
 ```
