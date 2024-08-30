@@ -139,9 +139,9 @@ const char *axes[] = {"X", "Y", "Z"};
 #define DIR_DOWN (1)
 const char *directions[] = {"up", "down"};
 
-vector_t offset = {.x = 0, .y = 0, .z = 0};
-vector_t scale_lo = {.x = 0, .y = 0, .z = 0};
-vector_t scale_hi = {.x = 0, .y = 0, .z = 0};
+vector_t offset = {.x = 0, .y = 0, .z = 0};  // g在x,y,z垂直时的投影分量
+vector_t scale_lo = {.x = 0, .y = 0, .z = 0}; // g在x,y,z同轴向时的投影分量
+vector_t scale_hi = {.x = 0, .y = 0, .z = 0}; // g在x,y,z反轴向时的投影分量
 
 /**
  * This will syncronuously read the accel data from MPU9250.  It will gather the offset and scalar values.
@@ -159,17 +159,17 @@ void calibrate_accel_axis(int axis, int dir)
     {
       if (dir == DIR_UP)  // X-up
       {
-        scale_lo.x += va.x;
+        scale_lo.x += va.x; // 此时up方向的重力累积
       }
       else  // X-down
       {
-        scale_hi.x += va.x;
+        scale_hi.x += va.x;  //次时down方向的重力累积
       }
     }
     else
     {
-      offset.y += va.y; // 计算g的水平投影y
-      offset.z += va.z; // 计算g的水平投影z
+      offset.y += va.y; // 此时 g的水平投影y
+      offset.z += va.z; // 此时 g的水平投影z
     }
 
     if (axis == Y_AXIS)
@@ -206,7 +206,7 @@ void calibrate_accel_axis(int axis, int dir)
       offset.y += va.y;
     }
 
-    vTaskDelay(5 / portTICK_PERIOD_MS);
+    vTaskDelay(5 / portTICK_PERIOD_MS); //5ms
   }
 }
 
@@ -257,7 +257,7 @@ void calibrate_accel(void)  //校准acc
  * MAGNETOMETER
  * 
  * 
- * Once the calibration is started you will want to move the sensor around all axes[8字一路狂甩].  What we want is to find the
+ * Once the calibration is started you will want to move the sensor around all axes.  What we want is to find the
  * extremes[极值] (min/max) of the x, y, z values such that[以便] we can find the offset and scale values.
  *
  * These calibration calculations are based on this page:
@@ -282,12 +282,11 @@ void calibrate_mag(void)
   const int NUM_MAG_READS = 2000;
 
   init_imu();
-
   ESP_LOGW(TAG, "Rotate the magnometer around all 3 axes, until the min and max values don't change anymore.");
   wait();  // 延时10秒,等待用户准备
 
   printf("    x        y        z      min x     min y     min z     max x     max y     max z\n");
-  for (int i = 0; i < NUM_MAG_READS; i += 1)
+  for (int i = 0; i < NUM_MAG_READS; i += 1)  //2000次 ，获得各个轴向的最大最小值
   {
     vector_t vm;
     get_mag(&vm);
@@ -307,13 +306,15 @@ void calibrate_mag(void)
       .x = (v_max.x - v_min.x) / 2.0,
       .y = (v_max.y - v_min.y) / 2.0,
       .z = (v_max.z - v_min.z) / 2.0};
-  float avg_radius = (v_avg.x + v_avg.y + v_avg.z) / 3.0;
+  float avg_radius = (v_avg.x + v_avg.y + v_avg.z) / 3.0;  //平均球形半径
+  //计算各个轴向(前后左右上下)的缩放比例(相对于标准球)
   vector_t v_scale = {
       .x = avg_radius / v_avg.x,
       .y = avg_radius / v_avg.y,
       .z = avg_radius / v_avg.z};
 
   printf("\n");
+  // max_x(+)+min_x(-)/2 ==>地磁测量中心 的offset偏移
   printf("    .mag_offset = {.x = %f, .y = %f, .z = %f},\n", (v_min.x + v_max.x) / 2, (v_min.y + v_max.y) / 2, (v_min.z + v_max.z) / 2);
   printf("    .mag_scale = {.x = %f, .y = %f, .z = %f},\n", v_scale.x, v_scale.y, v_scale.z);
 }

@@ -62,6 +62,7 @@ esp_err_t i2c_mpu9250_init(calibration_t *c)
   ESP_LOGD(TAG, "i2c_mpu9250_init");
 
   ESP_ERROR_CHECK(i2c_write_bit(I2C_MASTER_NUM, MPU9250_I2C_ADDR, MPU9250_RA_PWR_MGMT_1, MPU9250_PWR1_DEVICE_RESET_BIT, 1));
+  
   vTaskDelay(10 / portTICK_PERIOD_MS);  // 10ms
 
   // define clock source

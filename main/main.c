@@ -41,14 +41,14 @@ static const char *TAG = "main";
 #define I2C_MASTER_NUM I2C_NUM_0 /*!< I2C port number for master dev */
 
 calibration_t cal = {
-    .mag_offset = {.x = 25.183594, .y = 57.519531, .z = -62.648438},
-    .mag_scale = {.x = 1.513449, .y = 1.557811, .z = 1.434039},
+    .mag_offset = {.x = 25.183594, .y = 57.519531, .z = -62.648438},  // 椭球0点球心偏移
+    .mag_scale = {.x = 1.513449, .y = 1.557811, .z = 1.434039}, //椭球半径 相比 圆球 缩放系数
 
-    .accel_offset = {.x = 0.020900, .y = 0.014688, .z = -0.002580},
-    .accel_scale_lo = {.x = -0.992052, .y = -0.990010, .z = -1.011147},
-    .accel_scale_hi = {.x = 1.013558, .y = 1.011903, .z = 1.019645},
+    .accel_offset = {.x = 0.020900, .y = 0.014688, .z = -0.002580},  // 垂直重力轴的分量
+    .accel_scale_lo = {.x = -0.992052, .y = -0.990010, .z = -1.011147}, // 同重力轴的投影
+    .accel_scale_hi = {.x = 1.013558, .y = 1.011903, .z = 1.019645},  // 逆重力轴的投影
 
-    .gyro_bias_offset = {.x = 0.303956, .y = -1.049768, .z = -0.403782}};
+    .gyro_bias_offset = {.x = 0.303956, .y = -1.049768, .z = -0.403782}};  //0点offset偏移
 
 /**
  * Transformation: 符号取反
